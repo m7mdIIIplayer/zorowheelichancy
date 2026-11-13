@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#06160e">
+<title>ZORO WHEEL | عجلة زورو</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{
+  color-scheme:dark;--bg:#06120b;--surface:#10251a;--border:#2a6744;
+  --white:#f3fff5;--muted:#a3cbb0;--green:#80ff9e;--green2:#27c767;
+  --shadow:#020a05;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{min-height:100%;background:var(--bg)}
+body{
+  margin:0;min-height:100vh;overflow-x:hidden;color:var(--white);
+  font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;
+  background:
+    radial-gradient(ellipse 80% 35% at 51% 38%,#23774865,transparent 72%),
+    radial-gradient(circle at 9% 7%,#15492d99,transparent 36%),
+    radial-gradient(circle at 94% 89%,#103823,transparent 35%),
+    linear-gradient(156deg,#041009,#0b2416 48%,#040e09 100%);
+}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.24;
+  background-image:linear-gradient(45deg,#59e0890b 25%,transparent 25%,transparent 75%,#59e0890b 75%),
+    linear-gradient(45deg,#59e0890b 25%,transparent 25%,transparent 75%,#59e0890b 75%);
+  background-size:44px 44px;background-position:0 0,22px 22px}
+.app{position:relative;width:min(100%,510px);min-height:100vh;margin:0 auto;
+  padding:13px 15px max(26px,env(safe-area-inset-bottom));display:flex;flex-direction:column}
+/* The swordsman is an inline SVG, so the HTML needs no external picture file. */
+.hero{position:relative;isolation:isolate;min-height:166px;overflow:hidden;
+  border:1px solid #3baf68;border-radius:18px;padding:18px 16px;
+  background:radial-gradient(circle at 83% 21%,#51df8c43,transparent 47%),
+    linear-gradient(125deg,#0b2417,#133c27 58%,#0a1b11);
+  box-shadow:inset 0 1px #b9ffce25,0 10px 35px #0008,0 0 25px #3dee7930}
+.hero::before{content:"";position:absolute;inset:-44px -28px auto auto;width:228px;height:228px;
+  border:1px solid #93ffac42;border-radius:50%;box-shadow:0 0 0 18px #56fc7910,0 0 0 50px #56fc7908;pointer-events:none}
+.hero::after{content:"";position:absolute;inset:auto 0 0;height:4px;
+  background:linear-gradient(90deg,transparent,#5fff9e,#c9ffde,#5fff9e,transparent)}
+.hero-text{position:relative;z-index:2;width:63%;padding-top:6px}
+.kicker{font-size:10px;font-weight:1000;letter-spacing:2.5px;color:#8fffa9;direction:ltr;text-align:right}
+.hero h1{font-size:clamp(31px,9vw,42px);line-height:1.06;margin:10px 0 8px;
+  font-weight:1000;direction:ltr;text-align:right;letter-spacing:.8px;
+  text-shadow:0 2px 0 #082b17,0 0 25px #4aff8b5c}
+.hero h1 span{color:#91ffa7}
+.hero p{margin:0;font-size:12px;line-height:1.7;font-weight:750;color:#dafce5}
+.hero-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.hero-chips span{font-size:10px;padding:5px 8px;border-radius:7px;font-weight:850;
+  color:#ccffdc;background:#22653b88;border:1px solid #75ffa356}
+.zoro-portrait{position:absolute;z-index:1;left:-13px;bottom:-20px;width:50%;height:116%;
+  filter:drop-shadow(0 9px 8px #001007) drop-shadow(0 0 17px #66f99d45)}
+/* Wheel: 12 sectors and their server-side indexes remain unchanged. */
+.wheel-area{position:relative;width:100%;max-width:390px;aspect-ratio:1;margin:13px auto 6px;display:grid;place-items:center}
+.wheel-area::before{content:"";position:absolute;inset:11%;border-radius:50%;pointer-events:none;
+  box-shadow:0 0 38px 14px #1df2784e,0 0 70px 17px #1ff47523}
+.wheel-area::after{content:"";position:absolute;inset:9%;z-index:-1;border-radius:50%;pointer-events:none;
+  box-shadow:0 20px 28px 8px #000b}
+#wheel{display:block;width:100%;height:100%;transform:translate3d(0,0,0) rotate(0deg);
+  transform-origin:50% 50%;backface-visibility:hidden}
+.wheel-area.is-spinning #wheel{will-change:transform}
+.pointer{position:absolute;z-index:6;width:16%;height:18%;top:-1.8%;left:42%;
+  filter:drop-shadow(0 5px 3px #001407b3)}
+.pointer svg{width:100%;height:100%;display:block}
+.hub{position:absolute;z-index:5;inset:40.8%;border-radius:50%;display:grid;place-items:center;
+  color:#edfff1;font-weight:1000;font-size:clamp(13px,4.6vw,20px);font-style:italic;direction:ltr;
+  background:radial-gradient(circle at 27% 18%,#95f8b2,#17753d 50%,#062d18 85%);
+  border:5px solid #d3ffe0;box-shadow:0 0 0 3px #0b3f22,inset 0 -9px 12px #052915,0 0 16px #85ff9866;
+  text-shadow:0 2px 3px #042c17}
+.game-control{display:flex;align-items:center;gap:9px;margin-top:2px}
+.spin{flex:1;min-height:54px;cursor:pointer;border:1px solid #b9ffb5;border-radius:12px;
+  background:linear-gradient(105deg,#c6ffd0,#53e686 48%,#2eae59 83%,#a7ffc5);
+  box-shadow:inset 0 1px 3px #ffffff99,0 5px 0 #136837,0 9px 28px #000a;
+  color:#072713;font-weight:1000;font-size:18px;transition:filter .2s,transform .1s}
+.spin:active:not(:disabled){transform:translateY(3px);box-shadow:0 2px 0 #136837}
+.spin:disabled{opacity:.55;cursor:not-allowed;filter:grayscale(.3)}
+.mini-stat{min-width:90px;min-height:54px;padding:7px 9px;border:1px solid #366e49;
+  background:linear-gradient(150deg,#163c26,#0a2516);border-radius:11px;text-align:center}
+.mini-stat label{font-size:10px;display:block;color:#a9dabb;font-weight:850}
+.mini-stat strong{font-size:25px;line-height:1.1;display:block;color:#c2ffd2}
+.error{display:none;border:1px solid #a64c4c;border-radius:9px;margin-top:10px;padding:11px;
+  color:#ffd0d0;background:#3b1519;font-size:12px;text-align:center}
+.account{margin:19px 0 12px;display:flex;align-items:center;gap:10px;justify-content:space-between}
+.person{display:flex;align-items:center;gap:9px;min-width:0}
+.avatar{width:39px;height:39px;flex-shrink:0;border-radius:50%;border:1px solid #52a76a;
+  display:grid;place-items:center;background:#1d5031;font-size:21px}
+.who{min-width:0}.who b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who small{display:block;font-size:11px;color:#a6cbb4;white-space:nowrap}
+.other{background:#122d1e;border:1px solid #428257;border-radius:9px;padding:9px 11px;
+  color:#d7ffe2;cursor:pointer;font:700 12px system-ui;white-space:nowrap}
+.panel{margin-top:10px;border:1px solid #2a6541;border-radius:13px;padding:13px;
+  background:linear-gradient(145deg,#163823ea,#0a1e12e5);box-shadow:0 9px 30px #0005}
+.panelhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.panelhead b{font-size:13px}.badge{color:#87ffc0;font-size:11px;font-weight:800}
+.bonuses{display:grid;gap:8px}.bonus{border:1px solid #3a7850;border-radius:9px;padding:10px 11px;
+  background:#163b25;display:flex;justify-content:space-between;align-items:center;gap:7px}
+.bonus strong{color:#a3ffb7;font-size:14px}.bonus small{color:#b2d5bd;font-size:11px}
+.empty{padding:12px 4px;color:#9db9a5;text-align:center;font-size:12px}
+.tip{font-size:11px;line-height:1.7;color:#acc9b4;margin:12px 2px 0;text-align:center}
+.overlay{position:fixed;inset:0;z-index:12;background:#020b05e8;backdrop-filter:blur(7px);
+  display:none;align-items:center;justify-content:center;padding:18px}
+.overlay.show{display:flex}
+.dialog{max-width:410px;width:100%;background:linear-gradient(#173c26,#07180e);
+  border:1px solid #62dd88;border-radius:19px;padding:23px 20px;
+  box-shadow:0 25px 90px #000d,0 0 25px #45eb7430;text-align:center}
+.bigemoji{font-size:49px}.dialog h2{font-size:22px;margin:9px 0;color:#c0ffc9}
+.dialog p{color:#daf8e2;font-size:14px;line-height:1.7;white-space:pre-line}
+.close{font:850 14px system-ui;border-radius:10px;border:1px solid #57c17c;
+  background:linear-gradient(135deg,#247a44,#0c4827);color:#e7ffed;cursor:pointer;
+  padding:12px 17px;width:100%;margin-top:8px}
+.historyRows{max-height:56vh;overflow:auto;text-align:right}
+.entry{padding:12px 3px;border-bottom:1px solid #326746;display:flex;gap:10px;
+  justify-content:space-between;align-items:center}
+.entry b{display:block;font-size:13px}.entry small{font-size:11px;color:#9fc5ac}
+.entry time{color:#9abda3;display:block;font-size:11px;direction:ltr;text-align:left}
+@media(max-width:370px){.app{padding-inline:10px}.hero{min-height:150px;padding:14px 12px}
+  .hero h1{font-size:29px}.zoro-portrait{left:-10px}.other{padding:8px;font-size:11px}
+  .wheel-area{margin-top:10px}}
+@media(min-height:790px){.wheel-area{margin-top:20px;margin-bottom:12px}}
+@media(prefers-reduced-motion:reduce){.spin{transition:none}}
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="hero" aria-label="عجلة زورو">
+    <div class="hero-text">
+      <div class="kicker">THREE SWORD STYLE</div>
+      <h1>ZORO <span>WHEEL</span></h1>
+      <p>⚔️ عجلة الحظ بروح سياف ون بيس</p>
+      <div class="hero-chips"><span>🟢 GREEN EDITION</span><span>⚔️ زورو</span></div>
+    </div>
+    <!-- Original vector artwork with Zoro's recognizable green hair, scar, earrings and three swords. -->
+    <svg class="zoro-portrait" viewBox="0 0 230 260" aria-label="رسم زورو بشعر أخضر وسيوف" role="img" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="coat" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#173e27"/><stop offset=".52" stop-color="#0a2017"/><stop offset="1" stop-color="#040e0b"/></linearGradient>
+        <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffd6a4"/><stop offset=".53" stop-color="#ebb080"/><stop offset="1" stop-color="#a96545"/></linearGradient>
+        <linearGradient id="hair" x1="0" x2=".9" y1="0" y2="1"><stop stop-color="#c2ff9c"/><stop offset=".40" stop-color="#55c760"/><stop offset="1" stop-color="#175d33"/></linearGradient>
+        <linearGradient id="metal" x1="0" x2="1"><stop stop-color="#fafaff"/><stop offset=".5" stop-color="#a6cecf"/><stop offset="1" stop-color="#f9fffb"/></linearGradient>
+      </defs>
+      <!-- Three sword hilts and blades behind the shoulders -->
+      <g opacity=".95" stroke-linecap="round">
+        <g transform="rotate(-41 123 177)"><rect x="117" y="29" width="12" height="179" rx="4" fill="url(#metal)" stroke="#14462c" stroke-width="2"/><path d="M123 29L117 52H129Z" fill="#f1ffed"/><rect x="113" y="175" width="20" height="61" rx="4" fill="#241b29" stroke="#a3f4b6" stroke-width="2"/><path d="M113 187H133M113 199H133M113 211H133M113 223H133" stroke="#f5e9f7" stroke-width="3"/><path d="M99 176H147" stroke="#d4c28c" stroke-width="8"/></g>
+        <g transform="rotate(42 114 165)"><rect x="108" y="20" width="12" height="185" rx="4" fill="url(#metal)" stroke="#14462c" stroke-width="2"/><rect x="103" y="172" width="22" height="72" rx="5" fill="#222529" stroke="#f4f0df" stroke-width="2"/><path d="M103 181H125M103 194H125M103 207H125M103 220H125" stroke="#3cc569" stroke-width="3"/><path d="M91 171H137" stroke="#b7a875" stroke-width="8"/></g>
+        <g transform="rotate(82 116 178)"><rect x="109" y="12" width="13" height="210" rx="4" fill="url(#metal)" stroke="#165635" stroke-width="2"/><rect x="105" y="169" width="20" height="76" rx="4" fill="#692b21" stroke="#ecdacb" stroke-width="2"/><path d="M105 180H125M105 193H125M105 206H125M105 219H125" stroke="#f3cdb9" stroke-width="3"/><path d="M91 169H140" stroke="#d7b586" stroke-width="8"/></g>
+      </g>
+      <!-- Torso and open green coat -->
+      <path d="M39 256Q36 218 54 185L89 166L152 165Q192 182 205 256Z" fill="url(#coat)" stroke="#030f08" stroke-width="5"/>
+      <path d="M88 170L103 247L126 252L147 171L121 155Z" fill="url(#skin)" stroke="#8e543a" stroke-width="2"/>
+      <path d="M99 187L113 201L127 190M109 211L122 220" fill="none" stroke="#a26648" stroke-width="3" opacity=".65"/>
+      <path d="M91 166L80 205L106 242L85 256L55 208L65 183Z" fill="#165f39" stroke="#4dbb6b" stroke-width="2"/>
+      <path d="M143 166L153 205L124 245L145 256L177 211L163 182Z" fill="#0c482d" stroke="#47a361" stroke-width="2"/>
+      <path d="M46 242Q104 228 196 239L202 266H44Z" fill="#215837" stroke="#8fef9f" stroke-width="4"/>
+      <!-- Neck -->
+      <path d="M103 145L100 175Q115 193 137 172L132 143Z" fill="url(#skin)" stroke="#a46f4e" stroke-width="2"/>
+      <!-- Head, ear and jaw -->
+      <path d="M86 77Q83 57 112 51Q149 50 158 84L154 125Q145 158 121 162Q99 159 86 130L80 111Q73 105 79 94Z" fill="url(#skin)" stroke="#754935" stroke-width="3"/>
+      <path d="M150 101Q161 91 163 108Q163 123 151 126" fill="url(#skin)" stroke="#794837" stroke-width="3"/>
+      <!-- Three tiny gold earrings -->
+      <g fill="none" stroke="#ffda77" stroke-width="3"><path d="M156 123q-5 14 0 14q6 0 5-14"/><path d="M164 122q-5 15 0 15q6 0 5-15"/><path d="M172 119q-4 15 0 15q6 0 5-15"/></g>
+      <!-- Green spiky hair -->
+      <path d="M80 99L64 90L81 77L68 65L91 66L80 43L104 54L107 27L123 50L143 32L143 55L168 43L160 67L175 66L157 85L162 94Q134 74 105 82L86 108Z" fill="url(#hair)" stroke="#144e26" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M89 74L107 61M111 63L124 50M132 65L149 56M102 79L117 68" stroke="#e3ffb1" stroke-width="3" opacity=".78"/>
+      <!-- Eyes: one closed with Zoro's scar -->
+      <path d="M90 111L112 109M131 108L148 106" stroke="#3a2c2b" stroke-width="4" stroke-linecap="round"/>
+      <path d="M92 116Q102 113 112 116" stroke="#543e31" stroke-width="3" fill="none"/>
+      <path d="M133 115L147 114" stroke="#2d2423" stroke-width="3"/>
+      <circle cx="140" cy="115" r="2.8" fill="#161f1a"/>
+      <path d="M103 99L99 128L111 139" stroke="#ad624f" stroke-width="2.5" fill="none"/>
+      <!-- Nose and smirk -->
+      <path d="M125 117L120 133L127 136" stroke="#a96b4b" stroke-width="2.5" fill="none"/>
+      <path d="M113 147Q126 153 140 144" stroke="#5b332d" stroke-width="2.5" fill="none"/>
+      <path d="M116 148Q128 150 136 146" stroke="#fff7dc" stroke-width="2" fill="none"/>
+      <!-- Coat seam / shoulder highlights -->
+      <path d="M54 191L39 229M166 186L189 220" stroke="#37ac5f" stroke-width="4" opacity=".6"/>
+    </svg>
+  </header>
+
+  <section class="wheel-area" aria-label="عجلة حظ زورو">
+    <canvas id="wheel" width="900" height="900"></canvas>
+    <div class="hub">ZORO</div>
+    <div class="pointer" aria-hidden="true">
+      <svg viewBox="0 0 90 120" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="blade" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f1fff4"/><stop offset=".55" stop-color="#70ff9f"/><stop offset="1" stop-color="#106133"/></linearGradient></defs>
+        <path d="M11 22Q45 -3 79 22L49 99Q45 112 41 99Z" fill="url(#blade)" stroke="#dbffe3" stroke-width="5"/>
+        <path d="M26 24L45 84L62 24" fill="none" stroke="#effff0" stroke-width="5" opacity=".85"/>
+      </svg>
+    </div>
+  </section>
+
+  <div class="game-control">
+    <button id="spin" class="spin" type="button" disabled>⏳ جاري التحميل...</button>
+    <div class="mini-stat"><label>SPINS</label><strong id="spins">—</strong></div>
+  </div>
+  <p id="error" class="error" role="alert"></p>
+  <div class="account">
+    <div class="person"><div class="avatar">⚔️</div><div class="who"><b id="userName">ZORO PLAYER</b><small id="userHandle">@ZORO</small></div></div>
+    <button id="historyBtn" class="other" type="button">↶ آخر 10 لفات</button>
+  </div>
+  <section class="panel">
+    <div class="panelhead"><b>🎁 البونصات المفعّلة حالياً</b><span class="badge">صالحة 24 ساعة</span></div>
+    <div id="bonuses" class="bonuses"><div class="empty">ستظهر البونصات المفعّلة وقت إصدار الرابط.</div></div>
+  </section>
+  <section class="panel">
+    <div class="panelhead"><b>✅ بونصات العجلة المصروفة على الشحن</b><span class="badge">سجل آخر 10</span></div>
+    <div id="usedBonuses" class="bonuses"><div class="empty">لا يوجد سجل لاستخدام بونصات العجلة.</div></div>
+  </section>
+  <p class="tip">🎟️ تُمنح اللفة وفق نقاط الحظ المتاحة في البوت. البونصات صالحة 24 ساعة للشحن المؤكد عبر شام كاش، ويمكن جمعها. الجوائز النقدية الظاهرة على العجلة غير مفعّلة حالياً.</p>
+  <p class="tip">ℹ️ هذه المعلومات لقطة وقت إصدار الرابط. لمعرفة أحدث بونصاتك ولفاتك افتح لفة جديدة من البوت.</p>
+</main>
+
+<div class="overlay" id="resultModal" role="dialog" aria-modal="true" aria-label="نتيجة اللفة">
+  <div class="dialog"><div id="resultEmoji" class="bigemoji">⚔️</div>
+    <h2 id="resultTitle">ZORO</h2><p id="resultDescription"></p>
+    <button class="close" id="resultClose" type="button">متابعة</button>
+  </div>
+</div>
+<div class="overlay" id="historyModal" role="dialog" aria-modal="true" aria-label="سجل اللفات">
+  <div class="dialog"><h2>⚔️ آخر 10 لفات</h2><div id="historyRows" class="historyRows"></div>
+    <button class="close" id="historyClose" type="button">إغلاق</button>
+  </div>
+</div>
+<!-- Keep existing spin.wav, win.wav, lose.wav alongside this HTML to enable sounds. -->
+<audio id="wheelSpinSound" preload="auto" src="./spin.wav" loop></audio>
+<audio id="wheelWinSound" preload="auto" src="./win.wav"></audio>
+<audio id="wheelLoseSound" preload="auto" src="./lose.wav"></audio>
+<script>
+(()=>{'use strict';
+  const tg=window.Telegram?.WebApp;
+  tg?.ready();tg?.expand();
+  if(tg){try{tg.setHeaderColor('#06160e');tg.setBackgroundColor('#06120b')}catch(_){}}
+  const $=id=>document.getElementById(id);
+  const spinBtn=$('spin');
+  const params=new URLSearchParams(location.search);
+  const suppliedIndex=params.has('targetIndex')?Number(params.get('targetIndex')):NaN;
+  const suppliedAward=params.has('award')?Number(params.get('award')):NaN;
+  const suppliedBonus=params.has('bonusPercent')?Number(params.get('bonusPercent')):NaN;
+
+  // Preserve the original positions for 12 sectors and the existing bot URLs.
+  // Index 11 is now a non-winning sector, not a special prize.
+  // The two existing visual test cases remain *display only*, never a wallet credit.
+  const prizePreview=(
+    (suppliedIndex===4 && suppliedAward===100 && suppliedBonus===0) ||
+    (suppliedIndex===3 && suppliedAward===0 && suppliedBonus===50)
+  );
+  const validRound=(Number.isInteger(suppliedIndex) && suppliedAward===0 && (
+    (suppliedBonus===5 && [0,7].includes(suppliedIndex)) ||
+    (suppliedBonus===10 && suppliedIndex===3) ||
+    (suppliedBonus===0 && [1,5,9,11].includes(suppliedIndex))
+  )) || prizePreview;
+
+  // Compact URL snapshots: '.' separates rows, ',' separates integers.
+  function readRows(key,columns,limit=30){
+    const value=params.get(key)||'';
+    if(value.length>5000)return [];
+    return value.split('.').filter(Boolean).slice(0,limit)
+      .map(part=>part.split(',').map(Number))
+      .filter(row=>row.length===columns&&row.every(n=>Number.isSafeInteger(n)&&n>=0));
+  }
+  const activeBonuses=readRows('active',2).map(([percent,expiresAt])=>({percent,expiresAt}));
+  const usedBonuses=readRows('used',3,10).map(([percent,amount,appliedAt])=>({percent,amount,appliedAt}));
+  const history=readRows('history',4,10).map(([targetIndex,amount,bonusPercent,createdAt])=>({targetIndex,amount,bonusPercent,createdAt}));
+  const username=tg?.initDataUnsafe?.user;
+  if(username){
+    $('userName').textContent=[username.first_name,username.last_name].filter(Boolean).join(' ')||'ZORO PLAYER';
+    $('userHandle').textContent=username.username?'@'+username.username:'Telegram User';
+  }
+
+  // Do not reorder: these indexes must continue matching the server's targetIndex.
+  const slices=[
+    {text:'5%',icon:'🎁',fill:'#115b35',type:'bonus'},       // 0
+    {text:'HARD LUCK',icon:'✦',fill:'#ceffda',type:'lose'},  // 1
+    {text:'5$',icon:'💰',fill:'#0f492e',type:'money'},       // 2 - display only
+    {text:'10%',icon:'🎁',fill:'#c0f7cb',type:'bonus'},      // 3
+    {text:'100$',icon:'＄',fill:'#176b3e',type:'money'},     // 4 - display only
+    {text:'HARD LUCK',icon:'✦',fill:'#d7ffe2',type:'lose'},  // 5
+    {text:'10$',icon:'💰',fill:'#125331',type:'money'},      // 6 - display only
+    {text:'5%',icon:'🎁',fill:'#bcf3c9',type:'bonus'},       // 7
+    {text:'50$',icon:'＄',fill:'#145a35',type:'money'},      // 8 - display only
+    {text:'HARD LUCK',icon:'✦',fill:'#d2ffdc',type:'lose'},  // 9
+    {text:'25$',icon:'💰',fill:'#145b37',type:'money'},      // 10 - display only
+    {text:'HARD LUCK',icon:'⚔️',fill:'#b8f5c5',type:'lose'} // 11 replaces removed sector
+  ];
+  if(prizePreview&&suppliedIndex===3&&suppliedBonus===50){
+    slices[3]={...slices[3],text:'50%'};
+  }
+
+  const c=$('wheel'),ctx=c.getContext('2d');
+  const N=slices.length,C=450,R=408,step=2*Math.PI/N;
+  function wheelLabel(s){
+    if(s.type==='lose')return [{text:'HARD',size:31},{text:'LUCK',size:31}];
+    if(s.type==='bonus')return [{text:s.text,size:48}];
+    if(s.type==='money')return [{text:s.text,size:45}];
+    return [{text:s.text,size:30}];
+  }
+  function drawSliceText(s,i,center){
+    const radius=239,cos=Math.cos(center),sin=Math.sin(center);
+    const normal=(center+Math.PI*2)%(Math.PI*2);
+    const flip=normal>0&&normal<Math.PI;
+    const lines=wheelLabel(s),lightSector=i%2===1;
+    ctx.save();
+    ctx.translate(C+cos*radius,C+sin*radius);
+    ctx.rotate(center+Math.PI/2+(flip?Math.PI:0));
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.direction='ltr';
+    ctx.fillStyle=lightSector?'#154526':'#f3fff3';
+    ctx.strokeStyle=lightSector?'#e6fff0':'#0a2d1a';
+    ctx.lineWidth=2.5;ctx.lineJoin='round';
+    const lineHeight=35;
+    lines.forEach((line,j)=>{
+      const y=(j-(lines.length-1)/2)*lineHeight;
+      const minRadius=radius-Math.abs(y)-line.size/2;
+      const maxWidth=2*minRadius*Math.sin(step/2)-19;
+      let size=line.size;
+      ctx.font=`900 ${size}px Tahoma,Arial,sans-serif`;
+      while(ctx.measureText(line.text).width>maxWidth&&size>17){
+        size--;ctx.font=`900 ${size}px Tahoma,Arial,sans-serif`;
+      }
+      ctx.strokeText(line.text,0,y,maxWidth);
+      ctx.fillText(line.text,0,y,maxWidth);
+    });
+    ctx.restore();
+  }
+  function drawWheel(){
+    ctx.clearRect(0,0,900,900);
+    const halo=ctx.createRadialGradient(C,C,320,C,C,439);
+    halo.addColorStop(0,'#0b4d2b');halo.addColorStop(.77,'#70ff97');halo.addColorStop(1,'#092d1b');
+    ctx.beginPath();ctx.arc(C,C,435,0,2*Math.PI);ctx.fillStyle=halo;ctx.fill();
+    ctx.lineWidth=8;ctx.strokeStyle='#184e2d';ctx.stroke();
+    slices.forEach((s,i)=>{
+      const center=-Math.PI/2+i*step,start=center-step/2,end=center+step/2;
+      ctx.beginPath();ctx.moveTo(C,C);ctx.arc(C,C,R,start,end);ctx.closePath();
+      ctx.fillStyle=s.fill;ctx.fill();ctx.lineWidth=2;ctx.strokeStyle='#195c35';ctx.stroke();
+      const cos=Math.cos(center),sin=Math.sin(center);
+      ctx.save();ctx.translate(C+cos*331,C+sin*331);
+      ctx.beginPath();ctx.arc(0,0,42,0,Math.PI*2);
+      ctx.fillStyle=i%2?'#eefff0':'#b8f6c8';ctx.fill();
+      ctx.font='bold 40px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillStyle='#18452b';ctx.fillText(s.icon,0,2);ctx.restore();
+      drawSliceText(s,i,center);
+    });
+    ctx.beginPath();ctx.arc(C,C,410,0,2*Math.PI);ctx.lineWidth=11;ctx.strokeStyle='#67ee91';ctx.stroke();
+    ctx.beginPath();ctx.arc(C,C,394,0,2*Math.PI);ctx.lineWidth=2;ctx.strokeStyle='#eaffdca8';ctx.stroke();
+    // Small decorative studs around the immobile rim.
+    for(let j=0;j<24;j++){
+      const a=j*Math.PI/12;
+      ctx.beginPath();ctx.arc(C+424*Math.cos(a),C+424*Math.sin(a),5,0,Math.PI*2);
+      ctx.fillStyle=j%3===0?'#eefff1':'#71dc95';ctx.fill();
+    }
+  }
+  drawWheel();
+  let currentRotation=0,playing=false,round=null;
+  function setError(message){$('error').style.display=message?'block':'none';$('error').textContent=message||''}
+  function showAmount(num){return Number(num||0).toLocaleString('en-US')}
+  function formatTime(unix){
+    try{return new Date(unix*1000).toLocaleString('ar-SY',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}
+    catch{return ''}
+  }
+  function displayBonuses(list){
+    const holder=$('bonuses');holder.replaceChildren();
+    if(!list.length){holder.innerHTML='<div class="empty">ما عندك بونصات فعّالة حالياً. جرّب حظك مع زورو ⚔️</div>';return}
+    list.forEach(b=>{
+      const row=document.createElement('div');row.className='bonus';
+      const left=document.createElement('strong');left.textContent='BONUS +'+b.percent+'%';
+      const right=document.createElement('small');
+      const remaining=Math.max(0,b.expiresAt-Math.floor(Date.now()/1000));
+      right.textContent='متبقّي '+Math.floor(remaining/3600)+' ساعة و '+Math.floor(remaining%3600/60)+' دقيقة';
+      row.append(left,right);holder.appendChild(row);
+    });
+  }
+  function displayUsedBonuses(list){
+    const holder=$('usedBonuses');holder.replaceChildren();
+    if(!list.length){holder.innerHTML='<div class="empty">لا توجد عمليات صرف حديثة مسجّلة.</div>';return}
+    list.forEach(b=>{
+      const row=document.createElement('div');row.className='bonus';
+      const left=document.createElement('strong');left.textContent='+'+b.percent+'% = '+showAmount(b.amount)+' ل.س';
+      const right=document.createElement('small');right.textContent=formatTime(b.appliedAt);
+      row.append(left,right);holder.appendChild(row);
+    });
+  }
+  function showModal(title,description,emoji){
+    $('resultTitle').textContent=title;$('resultDescription').textContent=description;
+    $('resultEmoji').textContent=emoji;$('resultModal').classList.add('show');
+  }
+  const sounds={spin:$('wheelSpinSound'),win:$('wheelWinSound'),lose:$('wheelLoseSound')};
+  sounds.spin.volume=.70;sounds.win.volume=.95;sounds.lose.volume=.90;
+  function stopAudio(sound){if(!sound)return;try{sound.pause();sound.currentTime=0}catch(_){}}
+  function playAudio(sound){if(!sound)return;try{stopAudio(sound);const p=sound.play();if(p?.catch)p.catch(()=>{})}catch(_){}}
+  function stopAllAudio(){Object.values(sounds).forEach(stopAudio)}
+  function beginSpinAudio(){stopAllAudio();playAudio(sounds.spin)}
+  function finishSpinAudio(won){stopAudio(sounds.spin);playAudio(won?sounds.win:sounds.lose)}
+  window.addEventListener('pagehide',stopAllAudio);
+  function animateTo(index){
+    const targetIndex=Number(index),degrees=360/N;
+    if(!Number.isInteger(targetIndex)||targetIndex<0||targetIndex>=N)
+      return Promise.reject(Error('نتيجة العجلة غير صالحة'));
+    const current=((currentRotation%360)+360)%360;
+    let advance=(360-((current+(targetIndex*degrees))%360))%360;
+    if(advance<4)advance+=360;
+    const final=currentRotation+4*360+advance,duration=3900,area=c.parentElement;
+    return new Promise(resolve=>{
+      let settled=false,watchdog;
+      const endTransform=`translate3d(0,0,0) rotate(${final}deg)`;
+      const onEnd=e=>{if(e.target===c&&e.propertyName==='transform')finish()};
+      const finish=()=>{
+        if(settled)return;
+        settled=true;clearTimeout(watchdog);c.removeEventListener('transitionend',onEnd);
+        c.style.transition='none';c.style.transform=endTransform;
+        currentRotation=final;area.classList.remove('is-spinning');resolve();
+      };
+      area.classList.add('is-spinning');c.style.transition='none';
+      c.style.transform=`translate3d(0,0,0) rotate(${currentRotation}deg)`;
+      c.addEventListener('transitionend',onEnd);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        if(settled)return;
+        c.style.transition=`transform ${duration}ms cubic-bezier(0.12, 0.76, 0.14, 1)`;
+        c.style.transform=endTransform;
+      }));
+      watchdog=setTimeout(finish,duration+900);
+    });
+  }
+  function resultText(r){
+    if(prizePreview){
+      if(r.targetIndex===3)return ['🎁 بونص 50%','معاينة تصميم فقط — لا تتم إضافة بونص حقيقي.','🎁'];
+      return ['💰 100$','معاينة تصميم فقط — لا يتم تعديل الرصيد.','💰'];
+    }
+    if(r.bonusPercent)return ['🎁 بونص +'+r.bonusPercent+'%','صار عندك بونص على أول عملية شحن ناجحة خلال 24 ساعة.','🎁'];
+    if(r.award)return ['🎉 مبروك! '+showAmount(r.award)+' ل.س','الجائزة أضيفت تلقائياً إلى رصيدك داخل البوت.','💰'];
+    return ['⚔️ حظ أوفر باللفة الجاية','حاول مجدداً بعد حصولك على لفة من عملية شحن مؤهلة.','⚔️'];
+  }
+  async function startSpin(){
+    if(playing||!round)return;
+    playing=true;spinBtn.disabled=true;spinBtn.textContent='⚔️ العجلة تدور...';setError('');
+    beginSpinAudio();
+    try{
+      await animateTo(round.targetIndex);
+      finishSpinAudio(Number(round.bonusPercent)>0||Number(round.award)>0);
+      if(navigator.vibrate)navigator.vibrate([60,30,90]);
+      $('spins').textContent='0';
+      const [title,body,icon]=resultText(round);showModal(title,body,icon);
+      spinBtn.textContent='✅ تم عرض نتيجة اللفة';
+    }catch(e){
+      stopAudio(sounds.spin);setError(e.message||'خطأ أثناء العرض');
+      spinBtn.textContent='افتح لفة جديدة من البوت';spinBtn.disabled=true;
+    }
+  }
+  function init(){
+    if(!validRound){
+      $('spins').textContent='0';displayBonuses([]);displayUsedBonuses([]);
+      setError('افتح العجلة من زر بوت زورو للحصول على نتيجة لفة جديدة.');
+      spinBtn.textContent='بانتظار رابط اللفة';return;
+    }
+    round={targetIndex:suppliedIndex,award:suppliedAward,bonusPercent:suppliedBonus};
+    $('spins').textContent='1';
+    displayBonuses(activeBonuses.filter(b=>b.expiresAt>Math.floor(Date.now()/1000)));
+    displayUsedBonuses(usedBonuses);
+    spinBtn.textContent='⚔️ لف عجلة زورو الآن';spinBtn.disabled=false;
+  }
+  $('spin').addEventListener('click',startSpin);
+  $('resultClose').addEventListener('click',()=>$('resultModal').classList.remove('show'));
+  $('historyClose').addEventListener('click',()=>$('historyModal').classList.remove('show'));
+  document.addEventListener('keydown',event=>{
+    if(event.key==='Escape'){$('resultModal').classList.remove('show');$('historyModal').classList.remove('show')}
+  });
+  $('historyBtn').addEventListener('click',()=>{
+    const rows=$('historyRows');rows.replaceChildren();$('historyModal').classList.add('show');
+    if(!history.length){rows.innerHTML='<div class="empty">ما عندك أي لفات مسجّلة في هذا الرابط.</div>';return}
+    history.forEach(h=>{
+      const div=document.createElement('div');div.className='entry';
+      const item=document.createElement('div'),title=document.createElement('b'),date=document.createElement('small');
+      title.textContent=h.bonusPercent?'🎁 بونص '+h.bonusPercent+'%':h.amount?'💰 '+showAmount(h.amount)+' ل.س':'⚔️ حظ أوفر';
+      date.textContent='لفة زورو';item.append(title,date);
+      const time=document.createElement('time');time.textContent=formatTime(h.createdAt);
+      div.append(item,time);rows.appendChild(div);
+    });
+  });
+  init();
+})();
+</script>
+</body>
+</html>
